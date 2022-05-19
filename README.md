@@ -133,14 +133,14 @@ func (r *sqlRepository) FindAppointmentsForClinics(
         WithContext(ctx). // to propagate the active span for tracing
         Where("clinic_id IN ?", clinicIds).
         Order("start_time asc").
-        Scopes(pagination(page)).
+        Scopes(paginationScope(page)).
         Find(&appointments).Error; err != nil {
         return nil, err
     }
     return appointments, nil
 }
 
-func pagination(page pagination.Page) func(db *gorm.DB) *gorm.DB {
+func paginationScope(page pagination.Page) func(db *gorm.DB) *gorm.DB {
     return func(db *gorm.DB) *gorm.DB {
         return db.Offset(page.Offset()).Limit(page.Size())
     }
