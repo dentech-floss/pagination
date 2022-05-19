@@ -13,6 +13,8 @@ type Page interface {
 
 This is based on the [list pagination design pattern](https://cloud.google.com/apis/design/design_patterns#list_pagination) suggested by Google when working with protocol buffers as well as [gorm scopes](https://gorm.io/docs/scopes.html#Pagination).
 
+Do also check out the [dentech-floss/orm](https://github.com/dentech-floss/orm) lib which goes hand in hand with this lib.
+
 ## Install
 
 ```
