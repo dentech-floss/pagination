@@ -10,14 +10,14 @@ type Page interface {
 	Size() int
 	Offset() int
 	NextToken(resultSize int) *string
-	SetTotalCount(totalCount int64)
-	GetTotalCount() int64
+	SetResultSize(resultSize int)
+	GetPagesCount() int
 }
 
 type sqlPage struct {
 	number     int
 	size       int
-	totalCount int64
+	resultSize int
 }
 
 func NewSqlPage(
@@ -71,7 +71,7 @@ func (p *sqlPage) Offset() int {
 func (p *sqlPage) NextToken(resultSize int) *string {
 	if resultSize < p.size {
 		return nil
-	} else if p.totalCount == 0 || p.totalCount > int64(p.number)*int64(p.size) {
+	} else if p.resultSize == 0 || p.resultSize > p.number*p.size {
 		nextToken := strconv.Itoa(p.number + 1)
 		return &nextToken
 	}
@@ -79,10 +79,17 @@ func (p *sqlPage) NextToken(resultSize int) *string {
 	return nil
 }
 
-func (p *sqlPage) SetTotalCount(totalCount int64) {
-	p.totalCount = totalCount
+func (p *sqlPage) SetResultSize(resultSize int) {
+	p.resultSize = resultSize
 }
 
-func (p *sqlPage) GetTotalCount() int64 {
-	return p.totalCount
+func (p *sqlPage) GetPagesCount() int {
+	if p.resultSize == 0 {
+		return 0
+	}
+	result := p.resultSize / p.size
+	if p.resultSize%p.size > 0 {
+		result++
+	}
+	return result
 }

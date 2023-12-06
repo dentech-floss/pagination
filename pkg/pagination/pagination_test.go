@@ -95,35 +95,59 @@ func TestNewSqlPage(t *testing.T) {
 		}
 	})
 
-	t.Run("set total count", func(t *testing.T) {
-		p, err := NewSqlPage(nil, nil, 1, 100)
+	t.Run("set result size", func(t *testing.T) {
+		p, err := NewSqlPage(nil, nil, 20, 100)
 		if err != nil {
 			t.Fatal(err)
 		}
-		p.SetTotalCount(1)
-		if p.GetTotalCount() != 1 {
-			t.Fatal("unexpected total count")
+		p.SetResultSize(5)
+		if p.GetPagesCount() != 1 {
+			t.Fatal("unexpected total count. expected 1, got", p.GetPagesCount())
 		}
 	})
 
-	t.Run("get total count", func(t *testing.T) {
+	t.Run("set result size for one page", func(t *testing.T) {
+		p, err := NewSqlPage(nil, nil, 20, 100)
+		if err != nil {
+			t.Fatal(err)
+		}
+		p.SetResultSize(20)
+		if p.GetPagesCount() != 1 {
+			t.Fatal("unexpected total count. expected 1, got", p.GetPagesCount())
+		}
+
+		})
+
+	t.Run("set result size for two pages", func(t *testing.T) {
+		p, err := NewSqlPage(nil, nil, 20, 100)
+		if err != nil {
+			t.Fatal(err)
+		}
+		p.SetResultSize(21)
+		if p.GetPagesCount() != 2 {
+			t.Fatal("unexpected total count. expected 2, got", p.GetPagesCount())
+		}
+
+		})
+
+	t.Run("get pages count without set size", func(t *testing.T) {
 		p, err := NewSqlPage(nil, nil, 1, 100)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if p.GetTotalCount() != 0 {
+		if p.GetPagesCount() != 0 {
 			t.Fatal("unexpected total count")
 		}
 	})
 }
 
-func TestPaginationWithTotalCount(t *testing.T) {
+func TestPaginationWithPagesCalculation(t *testing.T) {
 	t.Run("total count enough", func(t *testing.T) {
 		p, err := NewSqlPage(nil, intPtr(20), 20, 100)
 		if err != nil {
 			t.Fatal(err)
 		}
-		p.SetTotalCount(40)
+		p.SetResultSize(40)
 		nextToken := p.NextToken(20)
 		if nextToken == nil {
 			t.Fatal("unexpected next token")
@@ -138,7 +162,7 @@ func TestPaginationWithTotalCount(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		p.SetTotalCount(40)
+		p.SetResultSize(40)
 		nextToken := p.NextToken(20)
 		if nextToken != nil {
 			t.Fatal("unexpected next token")
